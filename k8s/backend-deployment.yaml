@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: zahra1122/backend-app:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: MONGO_URI
+          value: "mongodb+srv://zahrairfan1923:zahra2003@clusterfora3p1.6zrfc.mongodb.net/web_prj_DB"
+        - name: JWT_SECRET
+          value: "12345678"
