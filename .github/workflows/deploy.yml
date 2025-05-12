@@ -1,0 +1,39 @@
+name: Build and Deploy to Minikube
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker to use Minikube's environment
+      run: |
+        echo "Switching Docker to use Minikube's daemon..."
+        eval $(minikube docker-env)
+
+    - name: Build Backend Docker Image
+      run: |
+        docker build -t zahra1122/backend-app:latest ./app/backend
+
+    - name: Build Frontend Docker Image
+      run: |
+        docker build -t zahra1122/frontend-app:latest ./app/frontend
+
+    - name: Push Backend to Docker Hub
+      run: docker push zahra1122/backend-app:latest
+
+    - name: Push Frontend to Docker Hub
+      run: docker push zahra1122/frontend-app:latest
+
+    - name: Deploy Backend to Minikube
+      run: kubectl apply -f k8s/backend-deployment.yaml -f k8s/backend-service.yaml -n scd-project
+
+    - name: Deploy Frontend to Minikube
+      run: kubectl apply -f k8s/frontend-deployment.yaml -f k8s/frontend-service.yaml -n scd-project
